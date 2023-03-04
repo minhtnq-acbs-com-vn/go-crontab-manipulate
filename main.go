@@ -48,9 +48,9 @@ func FileToVar(n string, v *[]string) {
 	}
 }
 
-func SliceToString(f []string) string {
+func SliceToString(f *[]string) string {
 	var temp string
-	for _, s := range f {
+	for _, s := range *f {
 		temp += s + "\n"
 	}
 	return temp
@@ -66,14 +66,14 @@ func WriteToFile(name string, data string) {
 func CUFile(l *[]string, id string, toggle string, cronjob string) bool {
 	var check bool
 	for i, data := range *l {
-		if strings.Contains(data, fmt.Sprintf("#%v:%v", id, toggle)) == true {
+		if strings.Contains(data, fmt.Sprintf("#%v:%v", id, toggle)) {
 			check = true
 			(*l)[i+1] = cronjob
 			break
 		}
 		check = false
 	}
-	if check == true {
+	if check {
 		fmt.Println("File updated")
 	} else {
 		fmt.Println("Cronjob added")
@@ -85,14 +85,14 @@ func CUFile(l *[]string, id string, toggle string, cronjob string) bool {
 func DFile(l *[]string, id string, toggle string) bool {
 	var check bool
 	for i, data := range *l {
-		if strings.Contains(data, fmt.Sprintf("#%v:%v", id, toggle)) == true {
+		if strings.Contains(data, fmt.Sprintf("#%v:%v", id, toggle)) {
 			check = true
 			*l = append((*l)[:i], (*l)[i+2:]...)
 			break
 		}
 		check = false
 	}
-	if check == true {
+	if check {
 		fmt.Println("File updated")
 	} else {
 		fmt.Println(fmt.Sprintf("Couldnt find #%v:%v", id, toggle))
@@ -106,7 +106,7 @@ func main() {
 
 	id, toggle, cronjob, op := InitFlag()
 
-	// GetCronFile()
+	GetCronFile()
 
 	FileToVar("file", &line)
 
@@ -119,7 +119,9 @@ func main() {
 		fmt.Println(result)
 	}
 
-	WriteToFile("file", SliceToString(line))
+	fmt.Println(cronjob)
 
-	// SetCronFile()
+	WriteToFile("file", SliceToString(&line))
+
+	SetCronFile()
 }
